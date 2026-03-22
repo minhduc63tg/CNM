@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <title>Cập nhật Sản phẩm</title>
+</head>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="content card shadow-sm p-4 mb-5 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Cập nhật sản phẩm</h3>
+                <a href="/products" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+
+            <hr />
+
+            <div class="form-section mb-5">
+                <form id="editProductForm" action="/products/update/<%= product.id %>" method="post"
+                    enctype="multipart/form-data" class="row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label for="name" class="font-weight-bold">Tên sản phẩm <span
+                                class="text-danger">*</span></label>
+                        <input class="form-control" type="text" id="name" name="name" value="<%= product.name %>"
+                            required readonly disabled />
+                        <!-- <small class="form-text text-muted">Tên sản phẩm không thể thay đổi</small> -->
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label for="price" class="font-weight-bold">Giá <span class="text-danger">*</span></label>
+                        <input class="form-control" type="number" id="price" name="price" value="<%= product.price %>"
+                            required min="1000" max="999999999" step="1000" />
+                        <small class="form-text text-muted">Giá tối thiểu: 1,000 VNĐ</small>
+                        <div class="invalid-feedback">Giá phải là số dương từ 1,000 VNĐ trở lên</div>
+                    </div>
+
+                    <div class="form-group col-md-4 mb-3">
+                        <label for="unit_in_stock" class="font-weight-bold">Số lượng tồn <span
+                                class="text-danger">*</span></label>
+                        <input class="form-control" type="number" id="unit_in_stock" name="unit_in_stock"
+                            value="<%= product.unit_in_stock %>" required min="0" max="999999" />
+                        <small class="form-text text-muted">Số nguyên từ 0 trở lên</small>
+                        <div class="invalid-feedback">Số lượng phải là số nguyên không âm</div>
+                    </div>
+
+                    <div class="form-group col-md-4 mb-3">
+                        <label for="image" class="font-weight-bold">Hình ảnh sản phẩm (Chọn để thay đổi)</label>
+                        <input class="form-control-file" type="file" id="image" name="image"
+                            accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" />
+                        <small class="form-text text-muted">JPG, PNG, GIF, WEBP (Tối đa 5MB)</small>
+                        <div class="invalid-feedback">Vui lòng chọn file ảnh hợp lệ</div>
+
+                        <% if(product.url_image) { %>
+                            <div class="mt-2">
+                                <img src="<%= product.url_image %>" alt="Current Image" style="height: 50px;"
+                                    class="img-thumbnail" />
+                                <small class="text-muted d-block">Ảnh hiện tại</small>
+                            </div>
+                            <% } %>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fa fa-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Validation cho form sửa sản phẩm
+        document.addEventListener('DOMContentLoaded', function () {
+            const editForm = document.getElementById('editProductForm');
+
+            if (editForm) {
+                editForm.addEventListener('submit', function (e) {
+                    const priceInput = document.getElementById('price');
+
+                    // SỬA Ở ĐÂY: Lấy DOM theo id="unit_in_stock"
+                    const quantityInput = document.getElementById('unit_in_stock');
+                    const imageInput = document.getElementById('image');
+
+                    let isValid = true;
+                    let errorMessages = [];
+
+                    // Validate giá
+                    const price = parseFloat(priceInput.value);
+                    if (isNaN(price) || price < 1000) {
+                        isValid = false;
+                        errorMessages.push('Giá phải là số dương từ 1,000 VNĐ trở lên');
+                        priceInput.classList.add('is-invalid');
+                    } else {
+                        priceInput.classList.remove('is-invalid');
+                    }
+
+                    // Validate số lượng
+                    const quantity = parseInt(quantityInput.value);
+                    if (isNaN(quantity) || quantity < 0 || !Number.isInteger(quantity)) {
+                        isValid = false;
+                        errorMessages.push('Số lượng tồn phải là số nguyên không âm');
+                        quantityInput.classList.add('is-invalid');
+                    } else {
+                        quantityInput.classList.remove('is-invalid');
+                    }
+
+                    // Validate hình ảnh (nếu có chọn file mới)
+                    if (imageInput.files.length > 0) {
+                        const file = imageInput.files[0];
+                        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+
+                        if (!allowedTypes.includes(file.type)) {
+                            isValid = false;
+                            errorMessages.push('Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF, WEBP');
+                            imageInput.classList.add('is-invalid');
+                        } else if (file.size > maxSize) {
+                            isValid = false;
+                            errorMessages.push('Kích thước file ảnh không được vượt quá 5MB');
+                            imageInput.classList.add('is-invalid');
+                        } else {
+                            imageInput.classList.remove('is-invalid');
+                        }
+                    }
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        alert('Vui lòng kiểm tra lại dữ liệu nhập:\n\n' + errorMessages.join('\n'));
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

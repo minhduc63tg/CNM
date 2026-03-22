@@ -1,0 +1,27 @@
+{
+  "name": "leminhduc_22656121_cnmonline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1009.0",
+    "@aws-sdk/client-s3": "^3.1009.0",
+    "@aws-sdk/lib-dynamodb": "^3.1009.0",
+    "@aws-sdk/s3-request-presigner": "^3.1009.0",
+    "body-parser": "^2.2.2",
+    "dotenv": "^17.2.3",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.11",
+    "uuid": "^9.0.1"
+  }
+}
